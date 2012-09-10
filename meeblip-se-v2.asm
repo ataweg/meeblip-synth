@@ -144,7 +144,7 @@
 ;-----------------------------------------------------------------------------
 ;registers:
 
-			; r0		; multiplierer result regsiter
+			; r0		; multiplier result register
 			; r1		; dto.
 
 ;current phase of DCO A:
@@ -156,11 +156,12 @@
 	.DEF PHASEB_0	= r5		; dto.
 	.DEF PHASEB_1	= r6		; dto.
 	.DEF PHASEB_2	= r7		; dto.
-	.DEF ZERO	= r8		; dto.
 
+	.DEF ZERO	= r8		; dto.
 ;DCF:
 	.def a_L	= r9		; used in timer0 ISR, not saved on stack
 	.def a_H	= r10		; also used in sate variable filter, keeps lowpass.
+
 	.def temp_SREG	= r11
 			; r12		; used in state variable filter, keeps bandpass
 			; r13		; so used in timer0 ISR, not saved on stack
@@ -169,16 +170,16 @@
 	.DEF OSC_OUT_H	= r15		; temporary used in ISR, not saved on stack
 
 	.def LDAC	= r16		; general purpose, used in ISR, saved on stack
-	.def HDAC	= r17		; dto
-
-	.def z_L	= r18		; temporary used in ISR, saved on stack
+	.def HDAC	= r17		; dto.
+	.def z_L	= r18		; dto.
 	.def z_H	= r19		; dto.
 
-			; r20		; general purpose, used in ISR, saved on stack
+			; r20		; dto.
 			; r21		; dto.
 			; r22		; dto.
 			; r23		; dto.
-			; r24		; dto.
+
+			; r24		; general purpose
 			; r25		; general purpose
 			; r26		; general purpose
 			; r27		; general purpose
@@ -1115,6 +1116,7 @@ OVERFLOW_7:
 	sub	OSC_OUT_L, LDAC		; HP filter, so output = filter input - output
 	sbc	OSC_OUT_H, HDAC		;
 	movw	LDAC, OSC_OUT_L		; output sample HDAC:LDAC = r17:r16
+
 ;-----------------------------------------------------------------------------
 ; Digitally Controlled Amplifier
 ;
@@ -2209,11 +2211,11 @@ RESET:
 
 	ldi	r16, 0
 	sts	LED_STATUS, r16		; LED status = off
-	sts	LED_TIMER, r16		;
-	sts	BUTTON_STATUS, r16	; no buttons pressed
-	sts	CONTROL_SWITCH, r16	; no switches flipped
+	sts	LED_TIMER, r16		; clear it
+	sts	BUTTON_STATUS, r16	; clear it, no buttons pressed
+	sts	CONTROL_SWITCH, r16	; clear it, no switches flipped
 	sts	SETMIDICHANNEL, r16	; Default MIDI channel to zero (omni)
-	sts	SWITCH3, r16		; MIDI/Save/Load switch hasn't been scanned yet, so clear it
+	sts	SWITCH3, r16		; clear it, MIDI/Save/Load switch hasn't been scanned yet, so clear it
 	sts	FMDEPTH, r16		; FM Depth = 0
 	sts	GATE, r16		; GATE = 0
 	sts	GATEEDGE, r16		; GATEEDGE = 0
@@ -2460,11 +2462,11 @@ MAINLOOP:
 
 MLP_SCAN:
 
-	; blink LED if LED/save/load button has been pressed
-	lds	r16, SWITCH3
+	; blink LED if midi/save/load button has been pressed
+	lds	r16, SWITCH3		; check if set from a previous scan
 	tst	r16
 	breq	CONTROL_EXIT		; Set button status: 1=MIDI, 2=SAVE, 4=LOAD
-	sts	BUTTON_STATUS, r16	; Set control status to MIDI, turn on control timer
+	sts	BUTTON_STATUS, r16	; Set control status, turn on control timer
 	ldi	r16, 63
 	sts	LED_TIMER, r16
 CONTROL_EXIT:
@@ -2492,7 +2494,7 @@ MLP_LED_OFF:
 MLP_LED_RESET:
 	sbi	PORT_MIDI_LED, MIDI_LED	; Clear everything
 	ldi	r16, 0
-	sts	BUTTON_STATUS, r16
+	sts	BUTTON_STATUS, r16	; clear it
 MLP_LED_EXIT:
 	sts	LED_STATUS, r16
 	sts	LED_TIMER, r17
@@ -2768,10 +2770,10 @@ NOT_OMNI:
 END_CONTROL_SET:
 	sbi	PORT_MIDI_LED, MIDI_LED; Clear control button parameters and leave the LED on
 	ldi	r16, 0			;
-	sts	BUTTON_STATUS, r16	;
-	sts	LED_STATUS, r16		;
-	sts	LED_TIMER, r16		;
-	sts	CONTROL_SWITCH, r16	;
+	sts	BUTTON_STATUS, r16	; clear it
+	sts	LED_STATUS, r16		; clear it
+	sts	LED_TIMER, r16		; clear it
+	sts	CONTROL_SWITCH, r16	; clear it
 SKIP_CONTROL_SET:
 
 ;-----------------------------------------------------------------------------
@@ -3620,7 +3622,6 @@ MLP_NLIM4:
 
 ;transpose 1 octave down:
 	subi	r23, 12			; note -= 12; Note range limited to 24..84
-
 
 ;portamento:
 	lds	r25, NOTE_L		;\
