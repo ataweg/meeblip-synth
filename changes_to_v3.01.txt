@@ -1,0 +1,104 @@
+changes to meeblip-se-v2.asm and meeblip-micro.aam     20.10.2012 Axel Werner
+-----------------------------------------------------------------------------
+
+Extended firmware version v3.01 with new features:
+
+48 byte patches (more midi parameter & switches)
+more "hidden" knobs and switches controlled thru midi
+  ADSR parameter for VCA- and VCF-envelop generators can be set directly thru midi (8 "hidden" knobs)
+  add switches used in previous versions of meeblip (switch 3 and 4)
+  MASTER_VOLUME control via midi
+new noise generator
+add ringmodulator
+control mixer balance thru midi
+predefined patches
+new TAB_VCF table
+some code optimizations
+
+;----------------------------------------------------------------------------
+; MIDI Control Change parameter table
+;----------------------------------------------------------------------------
+
+	MIDIMODWHEEL	= $01
+
+	LFO2FREQ	= $0E	; Knob 1	14 ; 0..255	 (PULSE_KNOB)
+	PWMDEPTH	= $0F	; Knob 2	15 ; 0..255	 (=LFO2LEVEL)
+	FMDEPTH		= $10	; Knob 3	16 ; 0..255
+	MIDI_KNOB_4	= $11	; Knob 4	17 ; 0..255
+	MIDI_KNOB_5	= $12	; Knob 5	18 ; 0..255
+	MIDI_KNOB_6	= $13	; Knob 6	19 ; 0..255
+	MIXER_BALANCE	= $14	; Knob 7	20 ; -128..+127
+	MASTER_VOLUME	= $15	; Knob 8	21 ; 0..255
+
+	ATTACKTIME2	= $16	; Slider 1	22 ; 0..255	 DCF envelope
+	DECAYTIME2	= $17	; Slider 2	23 ; 0..255
+	SUSTAINLEVEL2	= $18	; Slider 3	24 ; 0..255
+	RELEASETIME2	= $19	; Slider 4	25 ; 0..255
+	ATTACKTIME	= $1A	; Slider 5	26 ; 0..255	 DCA envelope
+	DECAYTIME	= $1B	; Slider 6	27 ; 0..255
+	SUSTAINLEVEL	= $1C	; Slider 7	28 ; 0..255
+	RELEASETIME	= $1D	; Slider 8	29 ; 0..255
+
+	SW1		= $2C ; Reserved	44
+	SW2		= $2D ; Reserved	45
+	SW3		= $2E ; Reserved	46
+	SW4		= $2F ; Reserved	47
+
+	; Unshifted knobs (potentiometer 0 through 7)
+	RESONANCE	= $30	;		48 ; 0..255
+	CUTOFF		= $31	;		49 ; 0..255
+	LFOFREQ		= $32	;		50 ; 0..255
+	PANEL_LFOLEVEL	= $33	;		51 ; 0..255
+	VCFENVMOD	= $34	;		52 ; -128..+127
+	PORTAMENTO	= $35	;		53 ; 0..255
+	PULSE_KNOB	= $36	; (=LFO2FREQ)	54 ; 0..255
+	OSC_DETUNE	= $37	;		55 ; -128..+127
+
+  ; Shifted knobs (potentiometer 0 through 7)
+;	X		= $38	; Undefined	56 ; 0..255
+;	X		= $39	; Undefined	57 ; 0..255
+	KNOB_DCF_DECAY	= $3A	;		58 ; 0..255
+	KNOB_DCF_ATTACK	= $3B	;		59 ; 0..255
+	KNOB_AMP_DECAY	= $3C	;		60 ; 0..255
+	KNOB_AMP_ATTACK	= $3D	;		61 ; 0..255
+;	X		= $3E	; Undefined	62 ; 0..255
+;	X		= $3F	; Undefined	63 ; 0..255
+
+; Panel switches 0..15
+; Switches 2
+	S_KNOB_SHIFT	= $40	;		64
+	S_OSC_FM	= $41	;		65
+	S_LFO_RANDOM	= $42	;		66
+	S_LFO_WAVE	= $43	;		67
+	S_FILTER_MODE	= $44	;		68
+	S_DISTORTION	= $45	;		69
+	S_LFO_ENABLE	= $46	;		70
+	S_LFO_DEST	= $47	;		71
+; Switches 1
+	S_ANTI_ALIAS	= $48	;		72
+	S_OSCB_OCT	= $49	;		73
+	S_OSCB_ENABLE	= $4A	;		74
+	S_OSCB_WAVE	= $4B	;		75
+	S_SUSTAIN	= $4C	;		76
+	S_OSCA_NOISE	= $4D	;		77
+	S_PWM_SWEEP	= $4E	;		78
+	S_OSCA_WAVE	= $4F	;		79
+; Switches 3
+	S_MIX_RING	= $50	;		80
+	S_VELOCITY	= $51	;		81
+	S_USER_3_2	= $52	;		82
+	S_TRANSPOSE	= $53	;		83
+	S_DCA_MODE	= $54	;		84
+	S_MODWHEEL_ENA	= $55	;		85
+	S_LFO_KBD_SYNC	= $56	;		86
+	S_DCF_KBD_TRACK	= $57	;		87
+; Switches 4
+	S_USER_4_0	= $58	;		88
+	S_USER_4_1	= $59	;		89
+	S_USER_4_2	= $5A	;		90
+	S_USER_4_3	= $5B	;		91
+	S_USER_4_4	= $5C	;		92
+	S_USER_4_5	= $5D	;		93
+	S_LFO2_WAVE	= $5E	; not used	94
+	S_LFO2_RANDOM	= $5F	; not used	95
+
