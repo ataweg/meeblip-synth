@@ -1,4 +1,17 @@
-changes to meeblip-se-v2.asm and meeblip-micro.aam     20.10.2012 Axel Werner
+changes to meeblip-se-v2.asm and meeblip-micro.asam     20.02.2013 Axel Werner
+-----------------------------------------------------------------------------
+
+Extended firmware version v3.03 with new features:
+
+add arpeggiator (inspired by code from Daniel Kruszyna)
+* new switches: DISTORTION => LFO_ENABLE, ARP_REPEAT => DISTORTION, ARP_ENABLE => FILTER_MODE
+* new knobs: ARP_RATE => upper OSC_B_DETUNE, ARP_THRESHOLD => PWM_WITDH
+use new TIMETORATE table with 128 values
+redesign ADC-Filter, to prevent LSB toggling
+
+
+
+changes to meeblip-se-v2.asm and meeblip-micro.asm     20.10.2012 Axel Werner
 -----------------------------------------------------------------------------
 
 Extended firmware version v3.01 with new features:
